@@ -14,16 +14,22 @@ import {
   View,
   Text,
   StatusBar,
+  Image,
 } from 'react-native';
+
+import More from './assets/more.svg';
 
 const App = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
-        <ScrollView contentInsetAdjustmentBehavior="automatic">
-          <View></View>
-        </ScrollView>
+        {/* <ScrollView contentInsetAdjustmentBehavior="automatic"> */}
+        <View style={styles.titleContainer}>
+          <Text>Today</Text>
+          <More />
+        </View>
+        {/* </ScrollView> */}
       </SafeAreaView>
     </>
   );
@@ -31,7 +37,15 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  titleContainer: {
+    // height: 73,
+    flex: 1,
+    // flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
