@@ -6,19 +6,43 @@
  * @flow
  */
 
-import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import React, {useRef} from 'react';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
 export default ({
   color,
   foregroundColor,
   title,
   items: {length: itemCount},
+  onPress,
+  onGetPosition,
 }) => {
+  const element = useRef(null);
+
+  const onLayout = e => {
+    onGetPosition &&
+      element.current.measure((fx, fy, width, height, px, py) => {
+        onGetPosition({
+          width,
+          height,
+          x: px,
+          y: py,
+        });
+      });
+  };
+
   return (
     <TouchableOpacity
+      ref={element}
+      {...{onPress}}
+      onLayout={onLayout}
       activeOpacity={0.7}
-      style={[styles.categoryContainer, {backgroundColor: color}]}>
+      style={[
+        styles.categoryContainer,
+        {
+          backgroundColor: color,
+        },
+      ]}>
       <Text style={[styles.categoryTitleText, {color: foregroundColor}]}>
         {title}
       </Text>

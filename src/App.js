@@ -6,21 +6,75 @@
  * @flow
  */
 
-import React from 'react';
-import {StyleSheet, ScrollView, View, Text, StatusBar} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {StyleSheet, View, Text, StatusBar} from 'react-native';
 
 import {currentList, categories} from './Constant';
 import More from './assets/more.svg';
 import CurrentListItem from './CurrentListItem';
 import CategoryItem from './CategoryItem';
+import CategoryDetail from './CategoryDetail';
+
+import {
+  useTimingTransition,
+  bInterpolate,
+  timing,
+  useValues,
+} from 'react-native-redash';
+import Animated, {
+  and,
+  cond,
+  greaterThan,
+  lessThan,
+  eq,
+  event,
+} from 'react-native-reanimated';
+
+const DURATION = 300;
+const DELAY_RATE = 0.3;
+const INITIAL_CATEGORY_DATA = {
+  index: 0,
+  position: {},
+};
 
 const App = () => {
+  const [selectedCategory, setSelectedCategory] = useState(
+    INITIAL_CATEGORY_DATA,
+  );
+  const [open, setOpen] = useState(false);
+  const categoryItemLayout = useRef([]);
+  const [scrollYOffset] = useValues([0], []);
+
+  const progress = useTimingTransition(open, {
+    duration: DURATION,
+  });
+  const secondaryProgress = cond(
+    and(greaterThan(progress, DELAY_RATE), lessThan(progress, 1)),
+    timing({
+      duration: DURATION - DURATION * DELAY_RATE,
+      from: open ? 0 : 1,
+      to: open ? 1 : 0,
+    }),
+    cond(eq(progress, 1), 1),
+  );
+
+  const opacity = bInterpolate(secondaryProgress, 1, 0.7);
+  const scale = bInterpolate(secondaryProgress, 1, 0.9);
+  const borderRadius = bInterpolate(secondaryProgress, 0, 16);
+
   return (
     <>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
       <View style={styles.mainContainer}>
-        <View style={styles.container}>
-          <ScrollView
+        <Animated.View
+          style={[
+            styles.container,
+            {opacity, borderRadius, transform: [{scale}]},
+          ]}>
+          <Animated.ScrollView
+            onScroll={event([
+              {nativeEvent: {contentOffset: {y: scrollYOffset}}},
+            ])}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContentContainer}>
             <View style={styles.titleContainer}>
@@ -33,11 +87,30 @@ const App = () => {
             <View style={styles.categoriesContainer}>
               <Text style={styles.categoriesTitleText}>Lists</Text>
               {categories.map((item, index) => (
-                <CategoryItem key={`${index}`} {...item} />
+                <CategoryItem
+                  key={`${index}`}
+                  {...item}
+                  onGetPosition={position =>
+                    categoryItemLayout.current.push({index, position})
+                  }
+                  onPress={() => {
+                    const selectedCategoryItemLayout = categoryItemLayout.current.find(
+                      p => p.index === index,
+                    );
+                    setSelectedCategory(selectedCategoryItemLayout);
+                    setOpen(true);
+                  }}
+                />
               ))}
             </View>
-          </ScrollView>
-        </View>
+          </Animated.ScrollView>
+        </Animated.View>
+        <CategoryDetail
+          {...categories[selectedCategory.index]}
+          position={selectedCategory.position}
+          {...{progress, open, scrollYOffset}}
+          onDismiss={() => setOpen(false)}
+        />
       </View>
     </>
   );
@@ -54,12 +127,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    // borderRadius: 8,
-    // transform: [
-    //   {
-    //     scale: 0.9,
-    //   },
-    // ],
   },
   titleContainer: {
     flexDirection: 'row',
