@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, useWindowDimensions} from 'react-native';
+import {View, StyleSheet, useWindowDimensions, Text} from 'react-native';
 
 import Animated, {
   cond,
@@ -21,12 +21,17 @@ import {
 } from 'react-native-redash';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 
+import Edit from './assets/edit.svg';
+import EditLight from './assets/edit_light.svg';
+import CateogryListItem from './CurrentListItem';
+import CategoryItem from './CategoryItem';
+
 const TOP_MARGIN = 60;
 const DRAG_DISTANCE_FOR_DISMISS = 200;
 
 export default ({
-  color,
-  foregroundColor,
+  color: backgroundColor,
+  theme,
   title,
   items,
   position: {x = 0, y = 0, width: elementWidth = 0, height: elementHeight = 0},
@@ -35,12 +40,14 @@ export default ({
   open,
   scrollYOffset,
 }) => {
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [translationY, state, translateY] = useValues(
     [0, State.UNDETERMINED, 0],
     [],
   );
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const opacity = cond(greaterThan(progress, 0.05), 1, 0);
+  const opacity = cond(progress, 1, 0);
+  const bodyOpacity = bInterpolate(progress, 0, 1);
+  const summaryOpacity = bInterpolate(progress, 1, 0);
   const left = bInterpolate(progress, x, 0);
   const width = bInterpolate(progress, elementWidth, windowWidth);
   const top = bInterpolate(
@@ -81,8 +88,9 @@ export default ({
       ]),
     [],
   );
-
   useCode(() => set(translateY, 0), [y]);
+  const isDark = theme === 'DARK';
+  const color = isDark ? 'rgba(0,0,0,.9)' : '#FFFFFF';
 
   return (
     <PanGestureHandler
@@ -93,7 +101,7 @@ export default ({
         style={[
           styles.container,
           {
-            backgroundColor: color,
+            backgroundColor,
             left,
             top,
             width,
@@ -102,6 +110,26 @@ export default ({
           },
         ]}>
         <View style={styles.indicator} />
+        <Animated.View style={{opacity: bodyOpacity}}>
+          <View style={styles.headerContainer}>
+            <View style={styles.headerTextContainer}>
+              <Text style={[styles.titleText, {color}]}>{title}</Text>
+              <Text
+                style={[
+                  styles.subTitleText,
+                  {color},
+                ]}>{`${items?.length} tasks`}</Text>
+            </View>
+            {isDark ? <Edit /> : <EditLight />}
+          </View>
+          {items?.map((item, index) => (
+            <CateogryListItem key={`${index}`} {...item} {...{theme}} />
+          ))}
+        </Animated.View>
+        <Animated.View
+          style={[styles.summaryContainer, {opacity: summaryOpacity}]}>
+          <CategoryItem {...{color: backgroundColor, theme, title, items}} />
+        </Animated.View>
       </Animated.View>
     </PanGestureHandler>
   );
@@ -119,5 +147,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,.2)',
     alignSelf: 'center',
     borderRadius: 3,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginLeft: 60,
+    marginRight: 16,
+    marginVertical: 16,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  titleText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  subTitleText: {
+    fontSize: 16,
+    opacity: 0.5,
+  },
+  summaryContainer: {
+    ...StyleSheet.absoluteFillObject,
+    top: -8,
   },
 });

@@ -1,28 +1,26 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 
 import Unmarked from './assets/unmarked.svg';
+import UnmarkedLight from './assets/unmarked_light.svg';
 import Alarm from './assets/alarm.svg';
+import AlarmLight from './assets/alarm_light.svg';
 
-export default ({text, tagColor, dueTime}) => {
+export default ({text, tagColor, dueTime, theme}) => {
+  const isDark = theme === 'DARK';
+  const color = isDark ? 'rgba(0,0,0,.9)' : '#FFFFFF';
   return (
     <View style={styles.currentListItemContainer}>
-      <Unmarked />
+      {isDark ? <Unmarked /> : <UnmarkedLight />}
       <View style={styles.currentListItemInnerContainer}>
         <View style={styles.currentListItemTextContainer}>
-          <Text style={styles.currentListItemText}>{text}</Text>
+          <Text style={[styles.currentListItemText, {color}]}>{text}</Text>
           {dueTime !== '' && (
             <View style={styles.currentListItemDueTimeContainer}>
-              <Alarm />
-              <Text style={styles.currentListItemDueTimeText}>{dueTime}</Text>
+              {isDark ? <Alarm /> : <AlarmLight />}
+              <Text style={[styles.currentListItemDueTimeText, {color}]}>
+                {dueTime}
+              </Text>
             </View>
           )}
         </View>
@@ -67,7 +65,7 @@ const styles = StyleSheet.create({
   currentListItemDueTimeText: {
     marginHorizontal: 2,
     fontSize: 14,
-    color: 'rgba(0,0,0,.3)',
+    opacity: 0.5,
   },
   currentListItemDueTimeContainer: {
     flexDirection: 'row',

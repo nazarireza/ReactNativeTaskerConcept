@@ -1,19 +1,11 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {useRef} from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
 export default ({
-  color,
-  foregroundColor,
+  color: backgroundColor,
+  theme,
   title,
-  items: {length: itemCount},
+  items: {length: itemCount} = {length: 0},
   onPress,
   onGetPosition,
 }) => {
@@ -31,25 +23,25 @@ export default ({
       });
   };
 
+  const isDark = theme === 'DARK';
+  const color = isDark ? 'rgba(0,0,0,.9)' : '#FFFFFF';
+
   return (
     <TouchableOpacity
       ref={element}
-      {...{onPress}}
-      onLayout={onLayout}
+      {...{onPress, onLayout}}
       activeOpacity={0.7}
       style={[
         styles.categoryContainer,
         {
-          backgroundColor: color,
+          backgroundColor,
         },
       ]}>
-      <Text style={[styles.categoryTitleText, {color: foregroundColor}]}>
-        {title}
-      </Text>
+      <Text style={[styles.categoryTitleText, {color}]}>{title}</Text>
       <Text
         style={[
           styles.categoryItemsCountText,
-          {color: foregroundColor},
+          {color},
         ]}>{`${itemCount} task`}</Text>
     </TouchableOpacity>
   );

@@ -30,18 +30,18 @@ export const categories = [
   {
     title: 'Inbox',
     color: '#EBEFF5',
-    foregroundColor: 'rgba(0,0,0,.9)',
+    theme: 'DARK',
     items: [
       {
         text: 'Dont forget to pick up Mickael from school',
-        dueTime: '',
+        dueTime: 'Today',
       },
     ],
   },
   {
     title: 'Work',
     color: '#61DEA4',
-    foregroundColor: '#FFFFFF',
+    theme: 'LIGHT',
     items: [
       {
         text: 'Start making a presentation',
@@ -56,7 +56,7 @@ export const categories = [
   {
     title: 'Personal',
     color: '#B678FF',
-    foregroundColor: '#FFFFFF',
+    theme: 'LIGHT',
     items: [
       {
         text: 'Pay for rent',
@@ -64,19 +64,22 @@ export const categories = [
       },
       {
         text: 'Cut ones hair',
+        dueTime: '',
       },
       {
         text: 'Continue learning French',
+        dueTime: '',
       },
       {
         text: 'Change AirPods',
+        dueTime: '',
       },
     ],
   },
   {
     title: 'Shopping',
     color: '#F45E6D',
-    foregroundColor: '#FFFFFF',
+    theme: 'LIGHT',
     items: [
       {
         text: 'Buy a milk',
@@ -95,7 +98,7 @@ export const categories = [
   {
     title: 'Family',
     color: '#FFE761',
-    foregroundColor: 'rgba(0,0,0,.9)',
+    theme: 'DARK',
     items: [
       {
         text: 'Greet niece',

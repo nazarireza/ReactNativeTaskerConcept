@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {useRef, useState} from 'react';
 import {StyleSheet, View, Text, StatusBar} from 'react-native';
 
@@ -28,12 +20,13 @@ import Animated, {
   lessThan,
   eq,
   event,
+  Easing,
 } from 'react-native-reanimated';
 
-const DURATION = 300;
+const DURATION = 700;
 const DELAY_RATE = 0.3;
 const INITIAL_CATEGORY_DATA = {
-  index: 0,
+  index: -1,
   position: {},
 };
 
@@ -47,6 +40,7 @@ const App = () => {
 
   const progress = useTimingTransition(open, {
     duration: DURATION,
+    easing: Easing.bezier(0.1, 0.45, 0.02, 1),
   });
   const secondaryProgress = cond(
     and(greaterThan(progress, DELAY_RATE), lessThan(progress, 1)),
@@ -58,9 +52,9 @@ const App = () => {
     cond(eq(progress, 1), 1),
   );
 
-  const opacity = bInterpolate(secondaryProgress, 1, 0.7);
-  const scale = bInterpolate(secondaryProgress, 1, 0.9);
-  const borderRadius = bInterpolate(secondaryProgress, 0, 16);
+  const opacity = bInterpolate(progress, 1, 0.7);
+  const scale = bInterpolate(progress, 1, 0.9);
+  const borderRadius = bInterpolate(progress, 0, 16);
 
   return (
     <>
@@ -82,7 +76,7 @@ const App = () => {
               <More />
             </View>
             {currentList.map((item, index) => (
-              <CurrentListItem key={`${index}`} {...item} />
+              <CurrentListItem key={`${index}`} {...item} theme="DARK" />
             ))}
             <View style={styles.categoriesContainer}>
               <Text style={styles.categoriesTitleText}>Lists</Text>
@@ -91,13 +85,13 @@ const App = () => {
                   key={`${index}`}
                   {...item}
                   onGetPosition={position =>
-                    categoryItemLayout.current.push({index, position})
+                    (categoryItemLayout.current[index] = position)
                   }
                   onPress={() => {
-                    const selectedCategoryItemLayout = categoryItemLayout.current.find(
-                      p => p.index === index,
-                    );
-                    setSelectedCategory(selectedCategoryItemLayout);
+                    setSelectedCategory({
+                      index,
+                      position: categoryItemLayout.current[index],
+                    });
                     setOpen(true);
                   }}
                 />
