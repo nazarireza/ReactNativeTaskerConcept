@@ -10,21 +10,11 @@ import CategoryDetail from './CategoryDetail';
 import {
   useTimingTransition,
   bInterpolate,
-  timing,
   useValues,
 } from 'react-native-redash';
-import Animated, {
-  and,
-  cond,
-  greaterThan,
-  lessThan,
-  eq,
-  event,
-  Easing,
-} from 'react-native-reanimated';
+import Animated, {event, Easing} from 'react-native-reanimated';
 
 const DURATION = 700;
-const DELAY_RATE = 0.3;
 const INITIAL_CATEGORY_DATA = {
   index: -1,
   position: {},
@@ -42,15 +32,6 @@ const App = () => {
     duration: DURATION,
     easing: Easing.bezier(0.1, 0.45, 0.02, 1),
   });
-  const secondaryProgress = cond(
-    and(greaterThan(progress, DELAY_RATE), lessThan(progress, 1)),
-    timing({
-      duration: DURATION - DURATION * DELAY_RATE,
-      from: open ? 0 : 1,
-      to: open ? 1 : 0,
-    }),
-    cond(eq(progress, 1), 1),
-  );
 
   const opacity = bInterpolate(progress, 1, 0.7);
   const scale = bInterpolate(progress, 1, 0.9);
